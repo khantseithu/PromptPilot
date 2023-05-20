@@ -6,8 +6,16 @@ import { useState, useEffect } from "react";
 import { signIn, signOut, useSession, getProviders } from "next-auth/react";
 
 const Nav = () => {
-  const isAunthenticated = true;
+  const { data: session } = useSession();
+  const [providers, setProviders] = useState(null);
   const [toggleDropDown, setToggleDropDown] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const res = await getProviders();
+      setProviders(res as any);
+    })();
+  }, []);
   return (
     <nav className="flex-between w-full mb-16 pt-3">
       <Link href="/" className="flex gap-3">
@@ -23,7 +31,7 @@ const Nav = () => {
 
       {/* Desktop Nav */}
       <div className="sm:flex hidden">
-        {isAunthenticated ? (
+        {session?.user ? (
           <div className="flex gap-3 md:gap-5">
             <Link href="/create-prompt" className="black_btn">
               Create Prompt
@@ -39,28 +47,33 @@ const Nav = () => {
 
             <Link href="/profile">
               <Image
-                src="/assets/images/logo.svg"
+                src={session?.user?.image}
                 alt="profile"
-                width={30}
-                height={30}
-                className="object-contain"
+                width={50}
+                height={50}
+                className="object-contain rounded-full"
               />
             </Link>
           </div>
         ) : (
-          <button
-            className="outline_btn"
-            type="button"
-            onClick={() => console.log("Sign In")}
-          >
-            Sign In{" "}
-          </button>
+          <>
+            {providers &&
+              Object.values(providers).map((provider) => (
+                <button
+                  className="outline_btn"
+                  type="button"
+                  onClick={() => signIn(provider.id)}
+                >
+                  Sign In{" "}
+                </button>
+              ))}
+          </>
         )}
       </div>
 
       {/*  Mobile Nav */}
       <div className="sm:hidden flex relative">
-        {isAunthenticated ? (
+        {session?.user ? (
           <div className="flex">
             <Image
               src="/assets/images/logo.svg"
@@ -101,13 +114,18 @@ const Nav = () => {
             )}
           </div>
         ) : (
-          <button
-            className="outline_btn"
-            type="button"
-            onClick={() => console.log("Sign In")}
-          >
-            Sign In{" "}
-          </button>
+          <>
+            {providers &&
+              Object.values(providers).map((provider) => (
+                <button
+                  className="outline_btn"
+                  type="button"
+                  onClick={() => signIn(provider.id)}
+                >
+                  Sign In{" "}
+                </button>
+              ))}
+          </>
         )}
       </div>
     </nav>
