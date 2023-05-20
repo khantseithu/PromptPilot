@@ -76,11 +76,11 @@ const Nav = () => {
         {session?.user ? (
           <div className="flex">
             <Image
-              src="/assets/images/logo.svg"
+              src={session?.user?.image}
               alt="profile"
-              width={30}
-              height={30}
-              className="object-contain"
+              width={50}
+              height={50}
+              className="object-contain rounded-full"
               onClick={() => setToggleDropDown(!toggleDropDown)}
             />
 
